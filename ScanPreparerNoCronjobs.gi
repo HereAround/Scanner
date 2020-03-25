@@ -707,8 +707,8 @@ if output = fail then # check if the stream works
   return;
 fi;
 SetPrintFormattingStatus( output, false );
-#WriteLine( output, String( lapse * 60 ) );
-WriteLine( output, String( 10 ) );
+WriteLine( output, String( lapse * 60 ) );
+#WriteLine( output, String( 10 ) );
 CloseStream(output);
 
 # and end this script
