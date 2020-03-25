@@ -131,7 +131,7 @@ dP3 := ToricVariety( Fan( rays, max_cones ) );
 number_of_monoms := Length( MonomsOfCoxRingOfDegreeByNormaliz( dP3, deg_curve ) );
 
 # compute the number of computations per thread
-comps_per_threads := (number_of_monoms^Length( choices ))/threads;
+comps_per_threads := (Length( choices )^number_of_monoms)/threads;
 if not IsInt( comps_per_threads ) then
     Error( "Inconsistency detected - number of computations per thread is not an integer" );
 fi;
