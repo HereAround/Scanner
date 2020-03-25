@@ -1,0 +1,110 @@
+# These instructions will (hopefully -> please inform me if you have problems) allow you to set up a scan over line bundle cohomologies.
+# I have tested these steps on a google cloud with Debian 9, 15GB RAM and 4 CPUs
+
+# Recall that we have two free parameters in our scans - the degree of the curve C (in dP3) and the degree of the line bundle L (on dP3) which we pullback to C.
+# These parameters are to be specified in step 5.
+
+# In a nutshell, what you have to do it the following:
+# (1) Set up your google cloud
+# (2) Install the software
+# (3) Download the scan script, modify it and execute it. I use 'vim' to modify files via ssh-connections. If you are not used to this, have a look at https://www.howtoforge.com/vim-basics.
+# (4) Once the scan is complete, collect the results
+# (5) Copy these results into our dropbox for analysis
+
+# The last step could be a bit tricky if you are not yet used to scp via ssh-connections. More below or ask me.
+
+
+# (1) Set up a google cloud with Debian 9, 15GB RAM and 4 CPUs and connect to it via ssh
+
+# You have to choose a project name for your google-cloud, say "MyProject"
+# Suppose you create an instance located at "us-central1-a"
+# Suppoe that this machine is called "instance-x", then you can connect to this machine via
+
+gcloud beta compute ssh --zone "us-central1-a" "instance-x" --project "MyProject"
+
+# For example, I (=Martin) am using the following
+
+gcloud beta compute ssh --zone "us-central1-a" "instance-3" --project "total-ensign-265912"
+
+
+# (2) Download the installation script and execute it
+curl -O https://martinbies.github.io/Install.sh
+chmod +x Install.sh
+./Install.sh
+
+
+# (3) Download scan preparer and cohomCalg
+
+# (3.1) Create scan folder
+cd
+mkdir Scans
+cd Scans
+
+# (3.2) Download ScanPreparer and cohomcalg from my website to this folder
+curl -O https://martinbies.github.io/ScanPreparer.gi
+curl -O https://martinbies.github.io/cohomcalg
+chmod +x cohomcalg
+
+# (3.3) Specify line bundle and degree of curve
+# (3.3) For this, I use the editor vim for this (c.f. https://www.howtoforge.com/vim-basics). Any other editor will work just as well.
+# (3.3) Specify the line bundle and the degree of the curve in lines 6 and 9
+vim ScanPreparer.gi
+# -> Now modify lines 6 and 9
+
+# (3.4) And issue the scan
+gap ScanPreparer.gi
+
+# (3.5) Monitor the progress of the scan
+
+# To see the overall progress of the scan, look at the log file MyScan.log e.g. with vim. (More details can be found in the MyCronJob.log.)
+
+# You can also directly connect to the running scan via screen. To this end, first list all available screens via
+screen -ls
+
+# Then pick the name of the screen-session, to which you want to connect and type
+screen -r 'name-of-screen'
+
+# For example for the screen "26608.ScanScanSunMar22145236UTC20201" (your screens will carry similar names) you would type
+screen -r 26608.ScanScanSunMar22145236UTC20201
+
+# To detach from this screen first press
+ctrl+a
+# and then
+d
+
+
+# (4) Collect results and remove cronjob
+# (4) Let "ScanX" be the name of the Scan folder created in step 3.3. In your particular instance, 'X' will be a string including date and time at which you started this scan.
+
+# remove cronjob and collect results
+cd Scans/ScanX/Controlers
+gap Collect.gi
+
+# see results
+cd Scans/ScanX/SummaryOfResults
+vim SummaryOfResults.csv
+
+
+# (5) Copy the file SummaryOfResults.csv into our dropbox, so that we can analyse the results.
+
+# Instruction on how to do this quick and easy can be found here:
+# https://cloud.google.com/compute/docs/instances/transfer-files?hl=en#transferbrowser
+
+# Alternatively, you can use gcloud's scp version.
+# Example: Your projects name is 'MyProject'
+#          Copy the file: ~/ScanX/SummaryOfResults/SummaryOfResults.csv
+#          Located on machine 'instance-3'
+#          Placed at zone 'us-central1-a'
+#          To the folder /home/user on your computer via:
+gcloud beta compute scp --zone "us-central1-a" --project "MyProject" instance-3:~/ScanX/SummaryOfResults/SummaryOfResults.csv /home/user/
+
+# This requires, that you have set up gcloud successfully. In particular, it needs to know your google account, have created an RSA fingerprint etc...
+
+# For example, for my instance-3, I (=Martin) issue the following command to copy the file ~/Install.sh from the google cloud to my local folder /home/user
+gcloud beta compute scp --zone "us-central1-a" --project "total-ensign-265912" instance-3:~/Install.sh /home/user
+
+# To copy folders, you have to provide the --recurse option. For example, I (= Martin) am using
+gcloud beta compute scp --zone "us-central1-a" --project "total-ensign-265912" --recurse instance-5:~/Scans/ /home/user
+
+# Similarly, to copy the file ScanPreparer.gi into the folder ~/Scans on instance-5, I (=Martin) use
+gcloud beta compute scp --zone "us-central1-a" --project "total-ensign-265912" ScanPreparer.gi instance-5:~/Scans/
