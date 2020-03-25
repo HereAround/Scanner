@@ -463,6 +463,63 @@ CloseStream(output);
 
 
 # --------------------------------------------------------------------
+# (7) Write the stop file
+# (7) Write the stop file
+# --------------------------------------------------------------------
+
+# initialise the directory and the filename
+name := Filename( Directory( Concatenation( path, "/Controlers" ) ), "Stop.gi" );
+
+# open filestream
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
+
+# turn off ugly line breaks etc.
+SetPrintFormattingStatus( output, false );
+
+# write the contents
+WriteLine( output, """############################################################################""" );
+WriteLine( output, """#### (1) Locate screen""" );
+WriteLine( output, """#### (1) Locate screen""" );
+WriteLine( output, """############################################################################""" );
+AppendTo( output, "\n" );
+WriteLine( output, """sys_programs := DirectoriesSystemPrograms();""" );
+WriteLine( output, """screen := Filename( sys_programs, "screen" );""" );
+AppendTo( output, "\n\n" );
+
+WriteLine( output, """############################################################################""" );
+WriteLine( output, """#### (2) Absolute path to scan superfolder""" );
+WriteLine( output, """#### (2) Absolute path to scan superfolder""" );
+WriteLine( output, """############################################################################""" );
+AppendTo( output, "\n" );
+WriteLine( output, Concatenation( "scan_superfolder := \"", absolute_path, "\";" ) );
+AppendTo( output, "\n\n" );
+
+WriteLine( output, """############################################################################""" );
+WriteLine( output, """#### (3) Stop scans""" );
+WriteLine( output, """#### (3) Stop scans""" );
+WriteLine( output, """############################################################################""" );
+AppendTo( output, "\n" );
+WriteLine( output, Concatenation( """for i in [ 1 .. """, String( Int( threads ) ), """ ] do""" ) );
+WriteLine( output, Concatenation("""	Exec( Concatenation( "screen -S Scan",""", "\"", date_str, "_\"", """, String ( i ), " -X quit" ) );""" ) );
+WriteLine( output, """od;""" );
+AppendTo( output, "\n\n" );
+
+WriteLine( output, """############################################################################""" );
+WriteLine( output, """#### (4) Close session""" );
+WriteLine( output, """#### (4) Close session""" );
+WriteLine( output, """############################################################################""" );
+AppendTo( output, "\n" );
+WriteLine( output, """QUIT;""" );
+
+# close the stream
+CloseStream(output);
+
+
+# --------------------------------------------------------------------
 # (8) Write file to collect the individual results
 # (8) Write file to collect the individual results
 # --------------------------------------------------------------------
@@ -589,10 +646,8 @@ for i in [ 1 .. threads ] do
 od;
 WriteLine( output, Concatenation( "echo \"", """\n""", "\"", """ >> """,  absolute_path, """/MyScan.log""" ) );
 
-# next kill all screens and delete tmp files
-AppendTo( output, "\n" );
-WriteLine( output, """/usr/bin/pkill screen""" );
-WriteLine( output, """rm -rf /tmp/*""" );
+# stop all screens
+WriteLine( output, Concatenation( """/usr/bin/gap """, absolute_path, """/Controlers/Stop.gi""" ) );
 
 # and restart the screens again
 WriteLine( output, Concatenation( """/usr/bin/gap """, absolute_path, """/Controlers/Start.gi""" ) );
