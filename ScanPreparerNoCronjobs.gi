@@ -91,6 +91,7 @@ for i in [ 1 .. threads ] do
 od;
 
 #and add the name of the scan folder
+current_path := absolute_path;
 absolute_path := Concatenation( absolute_path, "/", path );
 
 
@@ -131,7 +132,7 @@ dP3 := ToricVariety( Fan( rays, max_cones ) );
 number_of_monoms := Length( MonomsOfCoxRingOfDegreeByNormaliz( dP3, deg_curve ) );
 
 # compute the number of computations per thread
-comps_per_threads := (number_of_monoms^Length( choices ))/threads;
+comps_per_threads := (Length( choices )^number_of_monoms)/threads;
 if not IsInt( comps_per_threads ) then
     Error( "Inconsistency detected - number of computations per thread is not an integer" );
 fi;
@@ -660,32 +661,55 @@ Exec( Concatenation( "chmod +x ", absolute_path, "/Controlers/restart.sh" ) );
 
 
 
-# --------------------------------------------------------------------
-# (11) Start the scan
-# (11) Start the scan
-# --------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+# (11) Write tmp files with absolute path, number of threads and computations per thread
+# (11) Write tmp files with absolute path, number of threads and computations per thread
+# --------------------------------------------------------------------------------------
 
-start_file := ReplacedString( Concatenation( absolute_path, "/Controlers/Start.gi" ), " ", "\\ ");
-Exec( Concatenation( "screen -dm -S Starter gap -o 0 ", start_file ) );
+# write path.txt
+name := Filename( Directory( current_path ), "path.txt" );
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
+SetPrintFormattingStatus( output, false );
+WriteLine( output, String( absolute_path ) );
+CloseStream(output);
 
+# write threads.txt
+name := Filename( Directory( current_path ), "threads.txt" );
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
+SetPrintFormattingStatus( output, false );
+WriteLine( output, String( threads ) );
+CloseStream(output);
 
-# --------------------------------------------------------------------
-# (12) Inform about status
-# (12) Inform about status
-# --------------------------------------------------------------------
+# write compsPerThread.txt
+name := Filename( Directory( current_path ), "compsPerThread.txt" );
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
+SetPrintFormattingStatus( output, false );
+WriteLine( output, String( comps_per_threads ) );
+CloseStream(output);
 
-Print( "\n" );
-Print( "----------------------\n" );
-Print( "(*) Scan initiated\n" );
-Print( "----------------------\n" );
-Print( "\n" );
+# write compsPerThread.txt
+name := Filename( Directory( current_path ), "lapse.txt" );
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
+SetPrintFormattingStatus( output, false );
+#WriteLine( output, String( lapse * 60 ) );
+WriteLine( output, String( 10 ) );
+CloseStream(output);
 
-
-# --------------------------------------------------------------------
-# (13) Close
-# (13) Close
-# --------------------------------------------------------------------
+# and end this script
 QUIT;
-
-# Useful 1: End all screens
-# pkill screen
