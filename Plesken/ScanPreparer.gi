@@ -688,7 +688,7 @@ AppendTo( output, "\n" );
 
 WriteLine( output, """[Service]""" );
 WriteLine( output, """Type=oneshot""" );
-WriteLine( output, Concatenation( """ExecStart=""", absolute_path, """/Controlers/restart.sh""" );
+WriteLine( output, Concatenation( """ExecStart=""", absolute_path, """/Controlers/restart.sh""" ) );
 WriteLine( output, "User=bies" );
 
 # before:
