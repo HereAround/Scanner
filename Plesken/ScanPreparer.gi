@@ -639,7 +639,7 @@ WriteLine( output, """#!/bin/sh""" );
 AppendTo( output, "\n" );
 
 # write time/date and status of individual runs to log file
-WriteLine( output, Concatenation( """/bin/date >> """, absolute_path, """/MyScan.log""" ) );
+WriteLine( output, Concatenation( """date >> """, absolute_path, """/MyScan.log""" ) );
 for i in [ 1 .. threads ] do
     WriteLine( output, Concatenation( "echo \"", """Scan""", String( i ), """: """, "\"", """ >> """, absolute_path, """/MyScan.log""" ) );
     WriteLine( output, Concatenation( """cat """, absolute_path, """/Scan""", String( i ), """/StatusOfRun""", String( i ), """.txt""", """ >> """, absolute_path, """/MyScan.log""" ) );
@@ -648,10 +648,10 @@ od;
 WriteLine( output, Concatenation( "echo \"", """\n""", "\"", """ >> """, absolute_path, """/MyScan.log""" ) );
 
 # stop all screens
-WriteLine( output, Concatenation( """/usr/bin/gap """, absolute_path, """/Controlers/Stop.gi""" ) );
+WriteLine( output, Concatenation( """gap """, absolute_path, """/Controlers/Stop.gi""" ) );
 
 # and restart the screens again
-WriteLine( output, Concatenation( """/usr/bin/gap """, absolute_path, """/Controlers/Start.gi""" ) );
+WriteLine( output, Concatenation( """gap """, absolute_path, """/Controlers/Start.gi""" ) );
 
 # close the stream
 CloseStream(output);
