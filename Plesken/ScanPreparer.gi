@@ -689,10 +689,6 @@ AppendTo( output, "\n" );
 WriteLine( output, """[Service]""" );
 WriteLine( output, """Type=oneshot""" );
 WriteLine( output, Concatenation( """ExecStart=""", absolute_path, """/Controlers/restart.sh""" ) );
-WriteLine( output, "User=bies" );
-
-# before:
-#ExecStart=/home/gutsche/scripts/update_website.sh
 
 # close the stream
 CloseStream(output);
@@ -773,3 +769,11 @@ QUIT;
 
 # Useful:
 # journalctl -r and use "down arrow" and "up arrow" to scroll through log
+
+# Start sequence in systemd
+# enable
+# start
+# stop
+# disable
+# systemctl --user reset-failed
+# systemctl --user daemon-reload
