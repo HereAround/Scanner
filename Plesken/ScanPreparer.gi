@@ -643,8 +643,9 @@ WriteLine( output, Concatenation( """/bin/date >> """, absolute_path, """/MyScan
 for i in [ 1 .. threads ] do
     WriteLine( output, Concatenation( "echo \"", """Scan""", String( i ), """: """, "\"", """ >> """, absolute_path, """/MyScan.log""" ) );
     WriteLine( output, Concatenation( """cat """, absolute_path, """/Scan""", String( i ), """/StatusOfRun""", String( i ), """.txt""", """ >> """, absolute_path, """/MyScan.log""" ) );
+    WriteLine( output, Concatenation( "echo \"", """\n""", "\"", """ >> """, absolute_path, """/MyScan.log""" ) );
 od;
-WriteLine( output, Concatenation( "echo \"", """\n""", "\"", """ >> """,  absolute_path, """/MyScan.log""" ) );
+WriteLine( output, Concatenation( "echo \"", """\n""", "\"", """ >> """, absolute_path, """/MyScan.log""" ) );
 
 # stop all screens
 WriteLine( output, Concatenation( """/usr/bin/gap """, absolute_path, """/Controlers/Stop.gi""" ) );
@@ -660,50 +661,111 @@ Exec( Concatenation( "chmod +x ", absolute_path, "/Controlers/restart.sh" ) );
 
 
 # --------------------------------------------------------------------
-# (10) Set up cronjob
-# (10) Set up cronjob
+# (10) Write scan.service
+# (10) Write scan.service
 # --------------------------------------------------------------------
 
-#write out current crontab
-Exec( """crontab -l > mycron""" );
+# initialise scan.service
+name := Filename( Directory( "/home/bies/.config/systemd/user" ), Concatenation( "Scan", date_str, ".service" ) );
 
-#echo new cron into cron file
-command := Concatenation("""echo """, "\"","""*/""", String( lapse ),""" * * * * """, absolute_path, """/Controlers/restart.sh > """, absolute_path, """/MyCronJob.log 2>&1""", "\"", """>> mycron""" );
-Exec( command );
+# remove previous content
+PrintTo( name );
 
-#install new cron file
-Exec( """crontab mycron""" );
-Exec( """rm mycron""" );
+# open filestream
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
 
-#crontab -e
-#*/1 * * * * absolute_path/Controlers/restart.sh > /dev/null
+# turn off ugly line breaks etc.
+SetPrintFormattingStatus( output, false );
+
+# write stuff
+WriteLine( output, "[Unit]" );
+WriteLine( output, "Description=martins-cohomology-scan" );
+AppendTo( output, "\n" );
+
+WriteLine( output, """[Service]""" );
+WriteLine( output, """Type=oneshot""" );
+WriteLine( output, Concatenation( """ExecStart=""", absolute_path, """/Controlers/restart.sh""" );
+WriteLine( output, "User=bies" );
+
+# before:
+#ExecStart=/home/gutsche/scripts/update_website.sh
+
+# close the stream
+CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (11) Start the scan
-# (11) Start the scan
+# (11) Write scan.timer
+# (11) Write scan.timer
+# --------------------------------------------------------------------
+
+# initialise restart.sh
+name := Filename( Directory( "/home/bies/.config/systemd/user" ), Concatenation( "Scan", date_str, ".timer" ) );
+
+# open filestream
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
+
+# turn off ugly line breaks etc.
+SetPrintFormattingStatus( output, false );
+
+# write stuff
+WriteLine( output, "[Unit]" );
+WriteLine( output, "Description=Timer for service martins-cohomology-scan" );
+AppendTo( output, "\n" );
+
+WriteLine( output, """[Timer]""" );
+WriteLine( output, """OnCalender=*:0/5""" );
+WriteLine( output, "Persistent=true" );
+AppendTo( output, "\n" );
+
+WriteLine( output, """[Install]""" );
+WriteLine( output, """WantedBy=timers.target""" );
+
+# close the stream
+CloseStream(output);
+
+
+# --------------------------------------------------------------------
+# (12) Execute the scheduler
+# (12) Execute the scheduler
+# --------------------------------------------------------------------
+
+Exec( Concatenation( "systemctl --user enable --now Scan", date_str, ".timer" ) );
+
+
+# --------------------------------------------------------------------
+# (13) Start the scan
+# (13) Start the scan
 # --------------------------------------------------------------------
 
 start_file := ReplacedString( Concatenation( absolute_path, "/Controlers/Start.gi" ), " ", "\\ ");
-Exec( Concatenation( "screen -dm -S Supervisor gap -o 0 ", start_file ) );
+Exec( Concatenation( "screen -dm -S StartingScan gap -o 0 ", start_file ) );
 
 
 # --------------------------------------------------------------------
-# (12) Inform about status
-# (12) Inform about status
+# (14) Inform about status
+# (14) Inform about status
 # --------------------------------------------------------------------
 
 Print( "\n" );
 Print( "----------------------\n" );
 Print( "(*) Scan initiated\n" );
-Print( "(*) Cronjob running\n" );
+Print( "(*) Systemd running\n" );
 Print( "----------------------\n" );
 Print( "\n" );
 
 
 # --------------------------------------------------------------------
-# (13) Close
-# (13) Close
+# (15) Close this session
+# (15) Close this session
 # --------------------------------------------------------------------
 QUIT;
 
