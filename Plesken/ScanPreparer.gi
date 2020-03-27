@@ -666,7 +666,7 @@ Exec( Concatenation( "chmod +x ", absolute_path, "/Controlers/restart.sh" ) );
 # --------------------------------------------------------------------
 
 # initialise scan.service
-name := Filename( Directory( "/home/bies/.config/systemd/user" ), Concatenation( "Scan", date_str, ".service" ) );
+name := Filename( Directory( "/home/bies/.config/systemd/user" ), Concatenation( "martins-cohomology-scan", date_str, ".service" ) );
 
 # remove previous content
 PrintTo( name );
@@ -683,7 +683,7 @@ SetPrintFormattingStatus( output, false );
 
 # write stuff
 WriteLine( output, "[Unit]" );
-WriteLine( output, "Description=martins-cohomology-scan" );
+WriteLine( output, Concatenation( """Description=martins-cohomology-scan""", date_str ) );
 AppendTo( output, "\n" );
 
 WriteLine( output, """[Service]""" );
@@ -704,7 +704,7 @@ CloseStream(output);
 # --------------------------------------------------------------------
 
 # initialise restart.sh
-name := Filename( Directory( "/home/bies/.config/systemd/user" ), Concatenation( "Scan", date_str, ".timer" ) );
+name := Filename( Directory( "/home/bies/.config/systemd/user" ), Concatenation( "martins-cohomology-scan", date_str, ".timer" ) );
 
 # open filestream
 output := OutputTextFile( name, true );
@@ -718,7 +718,7 @@ SetPrintFormattingStatus( output, false );
 
 # write stuff
 WriteLine( output, "[Unit]" );
-WriteLine( output, "Description=Timer for service martins-cohomology-scan" );
+WriteLine( output, Concatenation( """Description=Timer for service martins-cohomology-scan""", date_str ) );
 AppendTo( output, "\n" );
 
 WriteLine( output, """[Timer]""" );
@@ -738,7 +738,7 @@ CloseStream(output);
 # (12) Execute the scheduler
 # --------------------------------------------------------------------
 
-Exec( Concatenation( "systemctl --user enable --now Scan", date_str, ".timer" ) );
+Exec( Concatenation( """systemctl --user enable --now martins-cohomology-scan""", date_str, """.timer""" ) );
 
 
 # --------------------------------------------------------------------
