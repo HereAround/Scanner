@@ -722,7 +722,7 @@ WriteLine( output, "Description=Timer for service martins-cohomology-scan" );
 AppendTo( output, "\n" );
 
 WriteLine( output, """[Timer]""" );
-WriteLine( output, """OnCalender=*:0/5""" );
+WriteLine( output, Concatenation( """OnCalender=*:0/""", String( lapse ) ) );
 WriteLine( output, "Persistent=true" );
 AppendTo( output, "\n" );
 
