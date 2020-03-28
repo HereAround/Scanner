@@ -736,7 +736,6 @@ CloseStream(output);
 # --------------------------------------------------------------------
 
 Exec( Concatenation( """systemctl --user enable --now martins-cohomology-scan""", date_str, """.timer""" ) );
-Exec( Concatenation( """systemctl --user start martins-cohomology-scan""", date_str, """.timer""" ) );
 
 
 # --------------------------------------------------------------------
