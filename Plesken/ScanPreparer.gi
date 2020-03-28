@@ -677,12 +677,12 @@ CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (11) Write restart.sh
-# (11) Write restart.sh
+# (11) Write status.sh
+# (11) Write status.sh
 # --------------------------------------------------------------------
 
 # initialise restart.sh
-name := Filename( Directory( Concatenation( path, "/Controlers" ) ), "restart.sh" );
+name := Filename( Directory( Concatenation( path, "/Controlers" ) ), "status.sh" );
 
 # open filestream
 output := OutputTextFile( name, true );
@@ -707,17 +707,11 @@ for i in [ 1 .. threads ] do
 od;
 WriteLine( output, Concatenation( "echo \"", """\n""", "\"", """ >> """, absolute_path, """/MyScan.log""" ) );
 
-# stop all screens
-WriteLine( output, Concatenation( """gap """, absolute_path, """/Controlers/Stop.gi""" ) );
-
-# and restart the screens again
-WriteLine( output, Concatenation( """gap """, absolute_path, """/Controlers/Start.gi""" ) );
-
 # close the stream
 CloseStream(output);
 
 # make this script executable
-Exec( Concatenation( "chmod +x ", absolute_path, "/Controlers/restart.sh" ) );
+Exec( Concatenation( "chmod +x ", absolute_path, "/Controlers/status.sh" ) );
 
 
 # --------------------------------------------------------------------
@@ -850,7 +844,7 @@ AppendTo( output, "\n" );
 
 WriteLine( output, """[Timer]""" );
 # other time there! very short lapse time!
-WriteLine( output, Concatenation( """OnCalendar=*:0/""", String( lapse ) ) );
+WriteLine( output, """OnCalendar=*:*:0/10""" );
 WriteLine( output, "Persistent=true" );
 AppendTo( output, "\n" );
 
