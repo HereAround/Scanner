@@ -687,6 +687,7 @@ WriteLine( output, Concatenation( """Description=martins-cohomology-scan""", dat
 AppendTo( output, "\n" );
 
 WriteLine( output, """[Service]""" );
+WriteLine( output, Concatenation( """Environment=""", "\"", """TERM=dumb""", "\"" ) );
 WriteLine( output, """Type=oneshot""" );
 WriteLine( output, Concatenation( """ExecStart=""", absolute_path, """/Controlers/restart.sh""" ) );
 
