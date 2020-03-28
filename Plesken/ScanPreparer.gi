@@ -659,16 +659,8 @@ WriteLine( output, """CloseStream( target );""" );
 AppendTo( output, "\n\n" );
 
 WriteLine( output, """############################################################################""" );
-WriteLine( output, """# (4) remove all cronjobs""" );
-WriteLine( output, """# (4) remove all cronjobs""" );
-WriteLine( output, """############################################################################""" );
-AppendTo( output, "\n" );
-WriteLine( output, """Exec( "crontab -r" );""" );
-AppendTo( output, "\n\n" );
-
-WriteLine( output, """############################################################################""" );
-WriteLine( output, """#### (5) Close session""" );
-WriteLine( output, """#### (5) Close session""" );
+WriteLine( output, """#### (4) Close session""" );
+WriteLine( output, """#### (4) Close session""" );
 WriteLine( output, """############################################################################""" );
 AppendTo( output, "\n" );
 WriteLine( output, """QUIT;""" );
@@ -699,14 +691,37 @@ SetPrintFormattingStatus( output, false );
 WriteLine( output, """#!/bin/sh""" );
 AppendTo( output, "\n" );
 
-# write time/date and status of individual runs to log file
+# set up the total number of computations to be performed
+WriteLine( output, Concatenation( """overall=""", String( Length( choices )^number_of_monoms - 1 ) ) );
+
+# write time/date to log file
 WriteLine( output, Concatenation( """date >> """, absolute_path, """/MyScan.log""" ) );
+
+# look up status of individual runs and save these results
+WriteLine( output, """total=0""" );
 for i in [ 1 .. threads ] do
     WriteLine( output, Concatenation( "echo \"", """Scan""", String( i ), """: """, "\"", """ >> """, absolute_path, """/MyScan.log""" ) );
     WriteLine( output, Concatenation( """cat """, absolute_path, """/Scan""", String( i ), """/StatusOfRun""", String( i ), """.txt""", """ >> """, absolute_path, """/MyScan.log""" ) );
     WriteLine( output, Concatenation( """echo $'\n' >> """, absolute_path, """/MyScan.log""" ) );
+    WriteLine( output, Concatenation( """thread_status=$(cat """, "\"", absolute_path, """/Scan""", String( i ), """/StatusOfRun""", String( i ), """.txt""", "\"", """)""" ) );
+    WriteLine( output, """total=$((total+thread_status))""" );
 od;
 WriteLine( output, Concatenation( """echo $'\n' >> """, absolute_path, """/MyScan.log""" ) );
+
+# check if the computation is finished
+WriteLine( output, Concatenation( """if [ """, "\"", """$total""", "\"", """ -gt """, "\"", """$overall""", "\"", """ ]""" ) );
+WriteLine( output, """then""" );
+    WriteLine( output, Concatenation( """echo """, "\"", """computation finished""", "\"" ) );
+    WriteLine( output, Concatenation( """systemctl --user stop --now stop-martins-cohomology-scan""", date_str, """.timer""" ) );
+    WriteLine( output, Concatenation( """systemctl --user disable --now stop-martins-cohomology-scan""", date_str, """.timer""" ) );
+    WriteLine( output, Concatenation( """systemctl --user stop --now start-martins-cohomology-scan""", date_str, """.timer""" ) );
+    WriteLine( output, Concatenation( """systemctl --user disable --now start-martins-cohomology-scan""", date_str, """.timer""" ) );
+    WriteLine( output, Concatenation( """rm /home/bies/.config/systemd/user/""", """start-martins-cohomology-scan""", date_str, """.timer""" ) );
+    WriteLine( output, Concatenation( """rm /home/bies/.config/systemd/user/""", """start-martins-cohomology-scan""", date_str, """.service""" ) );
+    WriteLine( output, Concatenation( """rm /home/bies/.config/systemd/user/""", """stop-martins-cohomology-scan""", date_str, """.timer""" ) );
+    WriteLine( output, Concatenation( """rm /home/bies/.config/systemd/user/""", """stop-martins-cohomology-scan""", date_str, """.service""" ) );
+    WriteLine( output, Concatenation( """gap """, absolute_path, """/Controlers/Collect.gi""" ) );
+WriteLine( output, """fi""" );
 
 # close the stream
 CloseStream(output);
