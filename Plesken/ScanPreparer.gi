@@ -570,6 +570,7 @@ SetPrintFormattingStatus( output, false );
 # write opening of script
 WriteLine( output, """#!/bin/sh""" );
 AppendTo( output, "\n" );
+WriteLine( output, Concatenation( absolute_path, """/Controlers/./status.sh""" ) );
 WriteLine( output, Concatenation( """gap """, absolute_path, """/Controlers/Stop.gi""" ) );
 
 # close the stream
@@ -703,9 +704,9 @@ WriteLine( output, Concatenation( """date >> """, absolute_path, """/MyScan.log"
 for i in [ 1 .. threads ] do
     WriteLine( output, Concatenation( "echo \"", """Scan""", String( i ), """: """, "\"", """ >> """, absolute_path, """/MyScan.log""" ) );
     WriteLine( output, Concatenation( """cat """, absolute_path, """/Scan""", String( i ), """/StatusOfRun""", String( i ), """.txt""", """ >> """, absolute_path, """/MyScan.log""" ) );
-    WriteLine( output, Concatenation( "echo \"", """\n""", "\"", """ >> """, absolute_path, """/MyScan.log""" ) );
+    WriteLine( output, Concatenation( """echo $'\n' >> """, absolute_path, """/MyScan.log""" ) );
 od;
-WriteLine( output, Concatenation( "echo \"", """\n""", "\"", """ >> """, absolute_path, """/MyScan.log""" ) );
+WriteLine( output, Concatenation( """echo $'\n' >> """, absolute_path, """/MyScan.log""" ) );
 
 # close the stream
 CloseStream(output);
