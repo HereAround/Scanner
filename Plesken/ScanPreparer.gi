@@ -447,7 +447,7 @@ AppendTo( output, "\n" );
 WriteLine( output, Concatenation( """for i in [ 1 .. """, String( Int( threads ) ), """ ] do""" ) );
 WriteLine( output, """	scan_file := Concatenation( scan_superfolder, "/Scan", String( i ), "/Scan.gi" );""" );
 WriteLine( output, """	scan_file := ReplacedString( scan_file, " ", "\\ ");""" );
-WriteLine( output, Concatenation("""	Exec( Concatenation( "screen -dm -S Scan",""", "\"", date_str, "_\"", """, String ( i ), " gap -o 0 ", scan_file ) );""" ) );
+WriteLine( output, Concatenation("""	Exec( Concatenation( "screen -Dm -S Scan",""", "\"", date_str, "_\"", """, String ( i ), " gap -o 0 ", scan_file ) );""" ) );
 WriteLine( output, """od;""" );
 AppendTo( output, "\n\n" );
 
