@@ -404,8 +404,8 @@ od;
 
 
 # --------------------------------------------------------------------
-# (6) Write the starter file
-# (6) Write the starter file
+# (6) Write Start.gi
+# (6) Write Start.gi
 # --------------------------------------------------------------------
 
 # initialise the directory and the filename
@@ -463,8 +463,38 @@ CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (7) Write the stop file
-# (7) Write the stop file
+# (7) Write start.sh
+# (7) Write start.sh
+# --------------------------------------------------------------------
+
+# initialise restart.sh
+name := Filename( Directory( Concatenation( path, "/Controlers" ) ), "start.sh" );
+
+# open filestream
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
+
+# turn off ugly line breaks etc.
+SetPrintFormattingStatus( output, false );
+
+# write opening of script
+WriteLine( output, """#!/bin/sh""" );
+AppendTo( output, "\n" );
+WriteLine( output, Concatenation( """gap """, absolute_path, """/Controlers/Start.gi""" ) );
+
+# close the stream
+CloseStream(output);
+
+# make this script executable
+Exec( Concatenation( "chmod +x ", absolute_path, "/Controlers/start.sh" ) );
+
+
+# --------------------------------------------------------------------
+# (8) Write Stop.gi
+# (8) Write Stop.gi
 # --------------------------------------------------------------------
 
 # initialise the directory and the filename
@@ -520,8 +550,38 @@ CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (8) Write file to collect the individual results
-# (8) Write file to collect the individual results
+# (9) Write stop.sh
+# (9) Write stop.sh
+# --------------------------------------------------------------------
+
+# initialise restart.sh
+name := Filename( Directory( Concatenation( path, "/Controlers" ) ), "stop.sh" );
+
+# open filestream
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
+
+# turn off ugly line breaks etc.
+SetPrintFormattingStatus( output, false );
+
+# write opening of script
+WriteLine( output, """#!/bin/sh""" );
+AppendTo( output, "\n" );
+WriteLine( output, Concatenation( """gap """, absolute_path, """/Controlers/Stop.gi""" ) );
+
+# close the stream
+CloseStream(output);
+
+# make this script executable
+Exec( Concatenation( "chmod +x ", absolute_path, "/Controlers/stop.sh" ) );
+
+
+# --------------------------------------------------------------------
+# (10) Write Collect.gi
+# (10) Write Collect.gi
 # --------------------------------------------------------------------
 
 # initialise the directory and the filename
@@ -617,8 +677,8 @@ CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (9) Set up script to restart the scan
-# (9) Set up script to restart the scan
+# (11) Write restart.sh
+# (11) Write restart.sh
 # --------------------------------------------------------------------
 
 # initialise restart.sh
@@ -661,12 +721,12 @@ Exec( Concatenation( "chmod +x ", absolute_path, "/Controlers/restart.sh" ) );
 
 
 # --------------------------------------------------------------------
-# (10) Write scan.service
-# (10) Write scan.service
+# (12) Write stop.service
+# (12) Write stop.service
 # --------------------------------------------------------------------
 
 # initialise scan.service
-name := Filename( Directory( "/home/bies/.config/systemd/user" ), Concatenation( "martins-cohomology-scan", date_str, ".service" ) );
+name := Filename( Directory( "/home/bies/.config/systemd/user" ), Concatenation( "stop-martins-cohomology-scan", date_str, ".service" ) );
 
 # remove previous content
 PrintTo( name );
@@ -683,25 +743,25 @@ SetPrintFormattingStatus( output, false );
 
 # write stuff
 WriteLine( output, "[Unit]" );
-WriteLine( output, Concatenation( """Description=martins-cohomology-scan""", date_str ) );
+WriteLine( output, Concatenation( """Description=stop-martins-cohomology-scan""", date_str ) );
 AppendTo( output, "\n" );
 
 WriteLine( output, """[Service]""" );
 WriteLine( output, Concatenation( """Environment=""", "\"", """TERM=dumb""", "\"" ) );
 WriteLine( output, """Type=oneshot""" );
-WriteLine( output, Concatenation( """ExecStart=""", absolute_path, """/Controlers/restart.sh""" ) );
+WriteLine( output, Concatenation( """ExecStart=""", absolute_path, """/Controlers/stop.sh""" ) );
 
 # close the stream
 CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (11) Write scan.timer
-# (11) Write scan.timer
+# (13) Write stop.timer
+# (13) Write stop.timer
 # --------------------------------------------------------------------
 
 # initialise restart.sh
-name := Filename( Directory( "/home/bies/.config/systemd/user" ), Concatenation( "martins-cohomology-scan", date_str, ".timer" ) );
+name := Filename( Directory( "/home/bies/.config/systemd/user" ), Concatenation( "stop-martins-cohomology-scan", date_str, ".timer" ) );
 
 # open filestream
 output := OutputTextFile( name, true );
@@ -715,7 +775,7 @@ SetPrintFormattingStatus( output, false );
 
 # write stuff
 WriteLine( output, "[Unit]" );
-WriteLine( output, Concatenation( """Description=Timer for service martins-cohomology-scan""", date_str ) );
+WriteLine( output, Concatenation( """Description=Timer for service stop-martins-cohomology-scan""", date_str ) );
 AppendTo( output, "\n" );
 
 WriteLine( output, """[Timer]""" );
@@ -731,41 +791,99 @@ CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (12) Execute the scheduler
-# (12) Execute the scheduler
+# (14) Write start.service
+# (14) Write start.service
 # --------------------------------------------------------------------
 
-Exec( Concatenation( """systemctl --user enable --now martins-cohomology-scan""", date_str, """.timer""" ) );
+# initialise scan.service
+name := Filename( Directory( "/home/bies/.config/systemd/user" ), Concatenation( "start-martins-cohomology-scan", date_str, ".service" ) );
+
+# remove previous content
+PrintTo( name );
+
+# open filestream
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
+
+# turn off ugly line breaks etc.
+SetPrintFormattingStatus( output, false );
+
+# write stuff
+WriteLine( output, "[Unit]" );
+WriteLine( output, Concatenation( """Description=start-martins-cohomology-scan""", date_str ) );
+AppendTo( output, "\n" );
+
+WriteLine( output, """[Service]""" );
+WriteLine( output, Concatenation( """Environment=""", "\"", """TERM=dumb""", "\"" ) );
+WriteLine( output, """Type=oneshot""" );
+WriteLine( output, Concatenation( """ExecStart=""", absolute_path, """/Controlers/start.sh""" ) );
+
+# close the stream
+CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (13) Start the scan
-# (13) Start the scan
+# (15) Write start.timer
+# (15) Write start.timer
 # --------------------------------------------------------------------
 
-start_file := ReplacedString( Concatenation( absolute_path, "/Controlers/Start.gi" ), " ", "\\ ");
-Exec( Concatenation( "screen -dm -S StartingScan gap -o 0 ", start_file ) );
+# initialise restart.sh
+name := Filename( Directory( "/home/bies/.config/systemd/user" ), Concatenation( "start-martins-cohomology-scan", date_str, ".timer" ) );
+
+# open filestream
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
+
+# turn off ugly line breaks etc.
+SetPrintFormattingStatus( output, false );
+
+# write stuff
+WriteLine( output, "[Unit]" );
+WriteLine( output, Concatenation( """Description=Timer for service start-martins-cohomology-scan""", date_str ) );
+AppendTo( output, "\n" );
+
+WriteLine( output, """[Timer]""" );
+# other time there! very short lapse time!
+WriteLine( output, Concatenation( """OnCalendar=*:0/""", String( lapse ) ) );
+WriteLine( output, "Persistent=true" );
+AppendTo( output, "\n" );
+
+WriteLine( output, """[Install]""" );
+WriteLine( output, """WantedBy=timers.target""" );
+
+# close the stream
+CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (14) Inform about status
-# (14) Inform about status
+# (16) Execute timer
+# (16) Execute timer
+# --------------------------------------------------------------------
+
+Exec( Concatenation( """systemctl --user enable --now stop-martins-cohomology-scan""", date_str, """.timer""" ) );
+Exec( Concatenation( """systemctl --user enable --now start-martins-cohomology-scan""", date_str, """.timer""" ) );
+
+
+# --------------------------------------------------------------------
+# (17) Inform about status and quit
+# (17) Inform about status and quit
 # --------------------------------------------------------------------
 
 Print( "\n" );
 Print( "----------------------\n" );
 Print( "(*) Scan initiated\n" );
-Print( "(*) Systemd running\n" );
+Print( "(*) Stop-timer running\n" );
+Print( "(*) Start-timer running\n" );
 Print( "----------------------\n" );
 Print( "\n" );
 
-
-# --------------------------------------------------------------------
-# (15) Close this session
-# (15) Close this session
-# --------------------------------------------------------------------
 QUIT;
-
 
 # Useful:
 # journalctl -r and use "down arrow" and "up arrow" to scroll through log
