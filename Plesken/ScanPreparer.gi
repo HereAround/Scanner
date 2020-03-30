@@ -731,6 +731,46 @@ Exec( Concatenation( "chmod +x ", absolute_path, "/Controlers/status.sh" ) );
 
 
 # --------------------------------------------------------------------
+# (12) Hard stop
+# (12) Hard stop
+# --------------------------------------------------------------------
+
+# initialise restart.sh
+name := Filename( Directory( Concatenation( path, "/Controlers" ) ), "hard_stop.sh" );
+
+# open filestream
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
+
+# turn off ugly line breaks etc.
+SetPrintFormattingStatus( output, false );
+
+# write opening of script
+WriteLine( output, """#!/bin/sh""" );
+AppendTo( output, "\n" );
+
+# check if the computation is finished
+WriteLine( output, Concatenation( """systemctl --user stop --now stop-martins-cohomology-scan""", date_str, """.timer""" ) );
+WriteLine( output, Concatenation( """systemctl --user disable --now stop-martins-cohomology-scan""", date_str, """.timer""" ) );
+WriteLine( output, Concatenation( """systemctl --user stop --now start-martins-cohomology-scan""", date_str, """.timer""" ) );
+WriteLine( output, Concatenation( """systemctl --user disable --now start-martins-cohomology-scan""", date_str, """.timer""" ) );
+WriteLine( output, Concatenation( """rm /home/bies/.config/systemd/user/""", """start-martins-cohomology-scan""", date_str, """.timer""" ) );
+WriteLine( output, Concatenation( """rm /home/bies/.config/systemd/user/""", """start-martins-cohomology-scan""", date_str, """.service""" ) );
+WriteLine( output, Concatenation( """rm /home/bies/.config/systemd/user/""", """stop-martins-cohomology-scan""", date_str, """.timer""" ) );
+WriteLine( output, Concatenation( """rm /home/bies/.config/systemd/user/""", """stop-martins-cohomology-scan""", date_str, """.service""" ) );
+WriteLine( output, Concatenation( absolute_path, """/Controlers/./stop.sh""" ) );
+
+# close the stream
+CloseStream(output);
+
+# make this script executable
+Exec( Concatenation( "chmod +x ", absolute_path, "/Controlers/hard_stop.sh" ) );
+
+
+# --------------------------------------------------------------------
 # (12) Write supervisor.sh
 # (12) Write supervisor.sh
 # --------------------------------------------------------------------
