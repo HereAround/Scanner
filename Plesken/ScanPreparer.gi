@@ -731,8 +731,46 @@ Exec( Concatenation( "chmod +x ", absolute_path, "/Controlers/status.sh" ) );
 
 
 # --------------------------------------------------------------------
-# (12) Write stop.service
-# (12) Write stop.service
+# (12) Write supervisor.sh
+# (12) Write supervisor.sh
+# --------------------------------------------------------------------
+
+# initialise restart.sh
+name := Filename( Directory( Concatenation( path, "/Controlers" ) ), "supervisor.sh" );
+
+# open filestream
+output := OutputTextFile( name, true );
+if output = fail then # check if the stream works
+  Error( "failed to set up file-stream" );
+  return;
+fi;
+
+# turn off ugly line breaks etc.
+SetPrintFormattingStatus( output, false );
+
+# write opening of script
+WriteLine( output, """#!/bin/sh""" );
+AppendTo( output, "\n" );
+
+WriteLine( output, """# start loop""" );
+WriteLine( output, """finished=false""" );
+WriteLine( output, """while ( ! $finished )""" );
+WriteLine( output, """do""" );
+WriteLine( output, """  ./start.sh""" );
+WriteLine( output, Concatenation( """  sleep """, String( 60 * lapse ) ) );
+WriteLine( output, """  ./stop.sh""" );
+WriteLine( output, """done""" );
+
+# close the stream
+CloseStream(output);
+
+# make this script executable
+Exec( Concatenation( "chmod +x ", absolute_path, "/Controlers/supervisor.sh" ) );
+
+
+# --------------------------------------------------------------------
+# (13) Write stop.service
+# (13) Write stop.service
 # --------------------------------------------------------------------
 
 # initialise scan.service
@@ -766,8 +804,8 @@ CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (13) Write stop.timer
-# (13) Write stop.timer
+# (14) Write stop.timer
+# (14) Write stop.timer
 # --------------------------------------------------------------------
 
 # initialise restart.sh
@@ -801,8 +839,8 @@ CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (14) Write start.service
-# (14) Write start.service
+# (15) Write start.service
+# (15) Write start.service
 # --------------------------------------------------------------------
 
 # initialise scan.service
@@ -836,8 +874,8 @@ CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (15) Write start.timer
-# (15) Write start.timer
+# (16) Write start.timer
+# (16) Write start.timer
 # --------------------------------------------------------------------
 
 # initialise restart.sh
@@ -872,8 +910,8 @@ CloseStream(output);
 
 
 # --------------------------------------------------------------------
-# (16) Execute timer
-# (16) Execute timer
+# (17) Execute timer
+# (17) Execute timer
 # --------------------------------------------------------------------
 
 Exec( Concatenation( """systemctl --user enable --now stop-martins-cohomology-scan""", date_str, """.timer""" ) );
@@ -881,8 +919,8 @@ Exec( Concatenation( """systemctl --user enable --now start-martins-cohomology-s
 
 
 # --------------------------------------------------------------------
-# (17) Inform about status and quit
-# (17) Inform about status and quit
+# (18) Inform about status and quit
+# (18) Inform about status and quit
 # --------------------------------------------------------------------
 
 Print( "\n" );
