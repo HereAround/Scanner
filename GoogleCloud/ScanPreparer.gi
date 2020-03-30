@@ -638,16 +638,33 @@ SetPrintFormattingStatus( output, false );
 WriteLine( output, """#!/bin/sh""" );
 AppendTo( output, "\n" );
 
-# write time/date and status of individual runs to log file
+# set up the total number of computations to be performed
+WriteLine( output, Concatenation( """overall=""", String( Length( choices )^number_of_monoms - 1 ) ) );
+
+# write time/date to log file
 WriteLine( output, Concatenation( """/bin/date >> """, absolute_path, """/MyScan.log""" ) );
+
+# look up status of individual runs and save these results
+WriteLine( output, """total=0""" );
 for i in [ 1 .. threads ] do
     WriteLine( output, Concatenation( "echo \"", """Scan""", String( i ), """: """, "\"", """ >> """, absolute_path, """/MyScan.log""" ) );
     WriteLine( output, Concatenation( """cat """, absolute_path, """/Scan""", String( i ), """/StatusOfRun""", String( i ), """.txt""", """ >> """, absolute_path, """/MyScan.log""" ) );
+    WriteLine( output, Concatenation( """echo $'\n' >> """, absolute_path, """/MyScan.log""" ) );
+    WriteLine( output, Concatenation( """thread_status=$(cat """, "\"", absolute_path, """/Scan""", String( i ), """/StatusOfRun""", String( i ), """.txt""", "\"", """)""" ) );
+    WriteLine( output, """total=$((total+thread_status))""" );
 od;
 WriteLine( output, Concatenation( "echo \"", """\n""", "\"", """ >> """,  absolute_path, """/MyScan.log""" ) );
 
-# stop all screens
+# stop all computations
 WriteLine( output, Concatenation( """/usr/bin/gap """, absolute_path, """/Controlers/Stop.gi""" ) );
+
+# check if the computation is finished
+WriteLine( output, Concatenation( """if [ """, "\"", """$total""", "\"", """ -gt """, "\"", """$overall""", "\"", """ ]""" ) );
+WriteLine( output, """then""" );
+    WriteLine( output, Concatenation( """echo """, "\"", """computation finished""", "\"" ) );
+    WriteLine( output, """crontab -r""");
+    WriteLine( output, Concatenation( """gap """, absolute_path, """/Controlers/Collect.gi""" ) );
+WriteLine( output, """fi""" );
 
 # and restart the screens again
 WriteLine( output, Concatenation( """/usr/bin/gap """, absolute_path, """/Controlers/Start.gi""" ) );
