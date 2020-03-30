@@ -664,10 +664,9 @@ WriteLine( output, """then""" );
     WriteLine( output, Concatenation( """echo """, "\"", """computation finished""", "\"" ) );
     WriteLine( output, """crontab -r""");
     WriteLine( output, Concatenation( """gap """, absolute_path, """/Controlers/Collect.gi""" ) );
+WriteLine( output, """else""" );
+    WriteLine( output, Concatenation( """/usr/bin/gap """, absolute_path, """/Controlers/Start.gi""" ) );
 WriteLine( output, """fi""" );
-
-# and restart the screens again
-WriteLine( output, Concatenation( """/usr/bin/gap """, absolute_path, """/Controlers/Start.gi""" ) );
 
 # close the stream
 CloseStream(output);
