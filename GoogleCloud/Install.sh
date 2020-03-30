@@ -40,7 +40,7 @@ echo ""
 
 echo "(*) Download gap 4.10.2"
 echo ""
-curl -O https://www.gap-system.org/pub/gap/gap-4.10/tar.gz/gap-4.10.2.tar.gz
+wget https://www.gap-system.org/pub/gap/gap-4.10/tar.gz/gap-4.10.2.tar.gz
 tar xf gap-4.10.2.tar.gz
 
 echo ""
