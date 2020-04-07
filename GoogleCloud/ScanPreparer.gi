@@ -638,6 +638,10 @@ SetPrintFormattingStatus( output, false );
 WriteLine( output, """#!/bin/sh""" );
 AppendTo( output, "\n" );
 
+# remove files in the tmp folder
+WriteLine( output, """rm -r -f /tmp/*""" );
+WriteLine( output, """rm -rf $(find /tmp -name 'gap_4ti2*' -execdir pwd \; )""" );
+
 # set up the total number of computations to be performed
 WriteLine( output, Concatenation( """overall=""", String( Length( choices )^number_of_monoms - 1 ) ) );
 
